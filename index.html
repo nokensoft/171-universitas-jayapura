@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="id" x-data="{ mobileMenu: false }">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Universitas Jayapura – Unggul, Inovatif, Berkarakter</title>
+  <link rel="icon" type="image/png" href="https://www.unijaya.ac.id/assets/img/logo.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { jakarta: ['Plus Jakarta Sans', 'sans-serif'] },
+          colors: {
+            brand: {
+              50:  '#f8eef6',
+              100: '#f0daeb',
+              200: '#e2b8d8',
+              300: '#d08fbe',
+              400: '#ba68a6',
+              500: '#9b2a88',
+              600: '#7d226d',
+              700: '#5f1a53',
+              800: '#421239',
+              900: '#2b0b25',
+            },
+            gold: {
+              50:  '#fffbeb',
+              100: '#fef3c7',
+              400: '#f59e0b',
+              500: '#d97706',
+              600: '#b45309',
+            }
+          },
+          borderRadius: { md: '8px', lg: '12px', xl: '16px', '2xl': '20px' },
+          boxShadow: { md: '0 4px 16px 0 rgba(155,42,136,0.08)', lg: '0 8px 32px 0 rgba(155,42,136,0.13)' }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
+    html { scroll-behavior: smooth; }
+
+    /* Topbar */
+    .topbar { background: #9b2a88; }
+
+    /* Navbar */
+    .navbar { background: white; border-bottom: 1px solid #e5e7eb; position: sticky; top: 0; z-index: 100; }
+
+    /* Mega Menu */
+    [x-cloak] { display: none !important; }
+    .mega-menu { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); background: white; border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: 0 8px 32px 0 rgba(155,42,136,0.13); z-index: 200; width: min(1280px, calc(100vw - 2rem)); }
+    .dropdown-menu { position: absolute; top: 100%; left: 0; background: white; border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: 0 8px 32px 0 rgba(155,42,136,0.13); z-index: 200; min-width: 240px; }
+    a:hover, button:hover { cursor: pointer; }
+    .card-hover:has(a):hover { cursor: pointer; }
+
+    /* Hero gradient */
+    .hero-bg { background: #9b2a88; background: linear-gradient(90deg, rgba(155, 42, 136, 1) 0%, rgba(87, 126, 199, 1) 50%, rgba(83, 237, 211, 1) 100%); }
+
+    /* Card hover */
+    .card-hover { transition: transform 0.2s, box-shadow 0.2s; }
+    .card-hover:hover { transform: translateY(-4px); box-shadow: 0 12px 32px 0 rgba(155,42,136,0.16); cursor: pointer; }
+
+    /* Animated gradient text */
+    .gradient-text { background: linear-gradient(135deg, #f59e0b, #fbbf24); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+    /* Section divider */
+    .section-badge { background: #f8eef6; color: #7d226d; border-radius: 100px; font-size: 13px; font-weight: 600; padding: 4px 14px; display: inline-block; }
+
+    /* Prodi card */
+    .prodi-icon { width: 52px; height: 52px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+
+    /* Gallery */
+    .gallery-item { overflow: hidden; border-radius: 12px; }
+    .gallery-item img { transition: transform 0.3s; }
+    .gallery-item:hover img { transform: scale(1.05); }
+    /* Hero image slider */
+    .hero-slider-stage { position: relative; width: 360px; height: 460px; }
+    .hero-slide {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 380px;
+      aspect-ratio: 4 / 5;
+      border-radius: 20px;
+      overflow: hidden;
+      transition: transform 1.2s ease, opacity 1.2s ease, filter 1.2s ease;
+      box-shadow: 0 16px 36px rgba(43, 11, 37, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .hero-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .hero-slide-front { z-index: 30; opacity: 1; filter: none; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+    .hero-slide-right { z-index: 20; opacity: 0.9; filter: brightness(0.96); transform: translate(-16%, -47%) scale(0.9) rotate(8deg); }
+    .hero-slide-left { z-index: 10; opacity: 0.72; filter: brightness(0.88); transform: translate(-84%, -53%) scale(0.88) rotate(-8deg); }
+    .hero-slide-hidden-right { z-index: 0; opacity: 0; filter: brightness(0.8); transform: translate(16%, -50%) scale(0.8) rotate(10deg); pointer-events: none; }
+    .hero-slide-hidden-left { z-index: 0; opacity: 0; filter: brightness(0.8); transform: translate(-116%, -50%) scale(0.8) rotate(-10deg); pointer-events: none; }
+
+    /* CTA */
+    .cta-bg { background: #9b2a88; background: linear-gradient(90deg, rgba(155, 42, 136, 1) 0%, rgba(87, 126, 199, 1) 50%, rgba(83, 237, 211, 1) 100%); }
+
+    /* Nav active */
+    .nav-active { color: #9b2a88 !important; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #9b2a88; border-radius: 3px; }
+
+    /* Ribbon */
+    .ribbon { position: absolute; top: 12px; left: -4px; background: #d97706; color: white; font-size: 11px; font-weight: 700; padding: 3px 12px; border-radius: 0 4px 4px 0; }
+    .ribbon::before { content: ''; position: absolute; left: 0; bottom: -4px; border-width: 2px 4px 2px 0; border-style: solid; border-color: transparent #92400e transparent transparent; }
+
+    /* Stat counter */
+    .stat-card { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; text-align: center; }
+
+    /* Timeline berita */
+    .berita-card { border-left: 3px solid #9b2a88; }
+
+    /* Smooth reveal */
+    @keyframes fadeUp { from { opacity:0; transform: translateY(24px); } to { opacity:1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.5s ease both; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+<div x-data="{ openDisclaimer: true }" x-show="openDisclaimer" x-cloak class="fixed inset-0 z-[300] flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/60 backdrop-blur-[2px]" @click="openDisclaimer = false"></div>
+  <div class="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-100 flex items-start justify-between gap-4">
+      <div class="flex items-center gap-3 min-w-0">
+        <img src="images/logo-nokensoft.png" alt="Logo Nokensoft" class="w-11 h-11 object-contain rounded-lg bg-gray-50 p-1 border border-gray-100" />
+        <div>
+          <div class="text-base font-extrabold text-brand-700 leading-tight">Nokensoft</div>
+          <div class="text-sm font-bold text-gray-900">Disclaimer Prototype</div>
+          <div class="text-xs text-gray-500">Dokumen Audit & Penawaran Nokensoft</div>
+        </div>
+      </div>
+      <button @click="openDisclaimer = false" class="w-8 h-8 rounded-lg border border-gray-200 text-gray-500 hover:text-gray-800 hover:bg-gray-50 transition-colors flex items-center justify-center text-xl leading-none" aria-label="Tutup disclaimer">×</button>
+    </div>
+    <div class="px-6 py-5">
+      <p class="text-gray-700 text-sm leading-relaxed mb-4">Website ini masih dalam tahap perancangan prototype awal sebagai penawaran desian baru. Semua informasi diambil gunakan metode pencarian di internet dan gambar dengan AI.</p>
+      <p class="text-gray-800 text-sm leading-relaxed font-medium">Dirancang dan dibuat oleh Tim Nokensoft.com, PIC: 082199558191 (Janzen).</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ TOPBAR ============================================================ -->
+<div class="topbar py-2 text-white text-xs" x-data="{}">
+  <div class="max-w-7xl mx-auto px-4 flex flex-wrap items-center justify-between gap-2">
+    <!-- Kiri: link eksternal -->
+    <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
+      <a href="https://kemdiktisaintek.go.id/" target="_blank" class="flex items-center gap-1 hover:text-yellow-300 transition-colors">
+        <i class="fa-solid fa-landmark text-yellow-400 text-[10px]"></i>
+        <span>Kemenristek</span>
+      </a>
+      <span class="text-blue-400">|</span>
+      <a href="https://sister.kemdikbud.go.id/" target="_blank" class="flex items-center gap-1 hover:text-yellow-300 transition-colors">
+        <i class="fa-solid fa-id-card text-yellow-400 text-[10px]"></i>
+        <span>SISTER</span>
+      </a>
+      <span class="text-blue-400">|</span>
+      <a href="http://bima.kemdiktisaintek.go.id/" target="_blank" class="flex items-center gap-1 hover:text-yellow-300 transition-colors">
+        <i class="fa-solid fa-briefcase text-yellow-400 text-[10px]"></i>
+        <span>BIMA</span>
+      </a>
+      <span class="text-blue-400">|</span>
+      <a href="https://pddikti.kemdiktisaintek.go.id/" target="_blank" class="flex items-center gap-1 hover:text-yellow-300 transition-colors">
+        <i class="fa-solid fa-database text-yellow-400 text-[10px]"></i>
+        <span>PDDikti</span>
+      </a>
+    </div>
+    <!-- Kanan: media sosial -->
+    <div class="flex items-center gap-3">
+      <span class="text-blue-300 text-[10px] uppercase tracking-wider font-medium">Ikuti kami:</span>
+      <a href="#" class="hover:text-blue-300 transition-colors" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+      <a href="#" class="hover:text-pink-300 transition-colors" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+      <a href="#" class="hover:text-sky-300 transition-colors" title="Twitter/X"><i class="fa-brands fa-x-twitter"></i></a>
+      <a href="#" class="hover:text-red-400 transition-colors" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+      <a href="#" class="hover:text-green-300 transition-colors" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ NAVBAR ============================================================ -->
+<nav class="navbar" x-data="{
+  tentangOpen: false,
+  akademikOpen: false,
+  jurnalOpen: false,
+  pendaftaranOpen: false,
+  closeAll() { this.tentangOpen = false; this.akademikOpen = false; this.jurnalOpen = false; this.pendaftaranOpen = false; }
+}">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="flex items-center justify-between h-[68px]">
+      <!-- Logo -->
+      <a href="#beranda" class="flex items-center gap-3 flex-shrink-0">
+        <img src="https://www.unijaya.ac.id/assets/img/logo.png" alt="Logo Universitas Jayapura" class="w-10 h-10 rounded-xl object-contain bg-white p-1" />
+        <div>
+          <div class="font-extrabold text-brand-800 text-[15px] leading-tight">Universitas Jayapura</div>
+          <div class="text-[10px] text-gray-500 font-medium tracking-wide uppercase">UNIJAYA – Sentani, Papua</div>
+        </div>
+      </a>
+
+      <!-- Desktop menu -->
+      <div class="hidden lg:flex items-center gap-1 text-[14px] font-medium text-gray-700" @click.away="closeAll()">
+
+        <!-- Beranda -->
+        <a href="#beranda" class="px-4 py-2 rounded-lg hover:bg-brand-50 hover:text-brand-600 transition-colors">Beranda</a>
+
+        <!-- Tentang (Dropdown) -->
+        <div class="relative" @mouseenter="tentangOpen=true" @mouseleave="tentangOpen=false">
+          <button class="flex items-center gap-1 px-4 py-2 rounded-lg hover:bg-brand-50 hover:text-brand-600 transition-colors" :class="tentangOpen ? 'text-brand-600 bg-brand-50' : ''">
+            Tentang <i class="fa-solid fa-chevron-down text-[10px] mt-0.5 transition-transform" :class="tentangOpen ? 'rotate-180' : ''"></i>
+          </button>
+          <div class="dropdown-menu p-2 w-56" x-show="tentangOpen" x-cloak x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0">
+            <a href="#" class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-brand-50 text-gray-700 hover:text-brand-700 transition-colors"><i class="fa-solid fa-scroll w-4 text-brand-500 text-sm"></i> Sejarah</a>
+            <a href="#" class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-brand-50 text-gray-700 hover:text-brand-700 transition-colors"><i class="fa-solid fa-bullseye w-4 text-brand-500 text-sm"></i> Visi & Misi</a>
+            <a href="#" class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-brand-50 text-gray-700 hover:text-brand-700 transition-colors"><i class="fa-solid fa-sitemap w-4 text-brand-500 text-sm"></i> Struktur Organisasi</a>
+            <a href="#" class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-brand-50 text-gray-700 hover:text-brand-700 transition-colors"><i class="fa-solid fa-award w-4 text-brand-500 text-sm"></i> Akreditasi</a>
+          </div>
+        </div>
+
+        <!-- Akademik (Mega Menu) -->
+        <div class="akademik-menu" @mouseenter="akademikOpen=true" @mouseleave="akademikOpen=false">
+          <button class="flex items-center gap-1 px-4 py-2 rounded-lg hover:bg-brand-50 hover:text-brand-600 transition-colors" :class="akademikOpen ? 'text-brand-600 bg-brand-50' : ''">
+            Akademik <i class="fa-solid fa-chevron-down text-[10px] mt-0.5 transition-transform" :class="akademikOpen ? 'rotate-180' : ''"></i>
+          </button>
+          <div class="mega-menu p-6" x-show="akademikOpen" x-cloak x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0">
+            <div class="grid grid-cols-3 gap-6">
+              <!-- Program Studi -->
+              <div>
+                <div class="text-xs font-700 text-gray-400 uppercase tracking-widest mb-3">Program Studi</div>
+                <a href="#" class="flex items-start gap-3 p-2.5 rounded-lg hover:bg-brand-50 group transition-colors mb-1">
+                  <div class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center text-red-600 flex-shrink-0"><i class="fa-solid fa-heart-pulse text-sm"></i></div>
+                  <div><div class="text-sm font-600 text-gray-800 group-hover:text-brand-700">Keperawatan</div><div class="text-xs text-gray-500">S1 & Profesi Ners</div></div>
+                </a>
+                <a href="#" class="flex items-start gap-3 p-2.5 rounded-lg hover:bg-brand-50 group transition-colors mb-1">
+                  <div class="w-8 h-8 bg-pink-100 rounded-lg flex items-center justify-center text-pink-600 flex-shrink-0"><i class="fa-solid fa-baby text-sm"></i></div>
+                  <div><div class="text-sm font-600 text-gray-800 group-hover:text-brand-700">Kebidanan</div><div class="text-xs text-gray-500">S1 & Profesi Bidan</div></div>
+                </a>
+                <a href="#" class="flex items-start gap-3 p-2.5 rounded-lg hover:bg-brand-50 group transition-colors mb-1">
+                  <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center text-green-600 flex-shrink-0"><i class="fa-solid fa-pills text-sm"></i></div>
+                  <div><div class="text-sm font-600 text-gray-800 group-hover:text-brand-700">Farmasi</div><div class="text-xs text-gray-500">S1</div></div>
+                </a>
+                <a href="#" class="flex items-start gap-3 p-2.5 rounded-lg hover:bg-brand-50 group transition-colors mb-1">
+                  <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 flex-shrink-0"><i class="fa-solid fa-hospital text-sm"></i></div>
+                  <div><div class="text-sm font-600 text-gray-800 group-hover:text-brand-700">Administrasi Rumah Sakit</div><div class="text-xs text-gray-500">S1</div></div>
+                </a>
+                <a href="#" class="flex items-start gap-3 p-2.5 rounded-lg hover:bg-brand-50 group transition-colors">
+                  <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center text-purple-600 flex-shrink-0"><i class="fa-solid fa-laptop-code text-sm"></i></div>
+                  <div><div class="text-sm font-600 text-gray-800 group-hover:text-brand-700">Bisnis Digital</div><div class="text-xs text-gray-500">S1</div></div>
+                </a>
+              </div>
+              <!-- Pendaftaran -->
+              <div>
+                <div class="text-xs font-700 text-gray-400 uppercase tracking-widest mb-3">Pendaftaran</div>
+                <a href="#" class="flex items-start gap-3 p-2.5 rounded-lg hover:bg-brand-50 group transition-colors mb-1">
+                  <div class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center text-yellow-600 flex-shrink-0"><i class="fa-solid fa-road text-sm"></i></div>
+                  <div><div class="text-sm font-600 text-gray-800 group-hover:text-brand-700">Jalur Pendaftaran</div><div class="text-xs text-gray-500">Reguler & Non-reguler</div></div>
+                </a>
+                <a href="#" class="flex items-start gap-3 p-2.5 rounded-lg hover:bg-brand-50 group transition-colors">
+                  <div class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center text-orange-600 flex-shrink-0"><i class="fa-solid fa-info-circle text-sm"></i></div>
+                  <div><div class="text-sm font-600 text-gray-800 group-hover:text-brand-700">Informasi Penerimaan</div><div class="text-xs text-gray-500">Biaya & Beasiswa</div></div>
+                </a>
+              </div>
+              <!-- Fasilitas -->
+              <div>
+                <div class="text-xs font-700 text-gray-400 uppercase tracking-widest mb-3">Fasilitas</div>
+                <a href="#" class="flex items-start gap-3 p-2.5 rounded-lg hover:bg-brand-50 group transition-colors mb-1">
+                  <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 flex-shrink-0"><i class="fa-solid fa-book-open text-sm"></i></div>
+                  <div><div class="text-sm font-600 text-gray-800 group-hover:text-brand-700">Perpustakaan</div><div class="text-xs text-gray-500">Digital & konvensional</div></div>
+                </a>
+                <a href="#" class="flex items-start gap-3 p-2.5 rounded-lg hover:bg-brand-50 group transition-colors mb-1">
+                  <div class="w-8 h-8 bg-teal-100 rounded-lg flex items-center justify-center text-teal-600 flex-shrink-0"><i class="fa-solid fa-flask text-sm"></i></div>
+                  <div><div class="text-sm font-600 text-gray-800 group-hover:text-brand-700">Laboratorium</div><div class="text-xs text-gray-500">Modern & lengkap</div></div>
+                </a>
+                <a href="#" class="flex items-start gap-3 p-2.5 rounded-lg hover:bg-brand-50 group transition-colors">
+                  <div class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center text-red-600 flex-shrink-0"><i class="fa-solid fa-house-medical text-sm"></i></div>
+                  <div><div class="text-sm font-600 text-gray-800 group-hover:text-brand-700">Klinik & Apotek</div><div class="text-xs text-gray-500">Pelayanan kesehatan</div></div>
+                </a>
+                <!-- CTA Banner -->
+                <div class="mt-4 bg-brand-700 rounded-xl p-4 text-white">
+                  <div class="text-xs font-600 mb-1">Daftar Sekarang 2025/2026</div>
+                  <div class="text-[11px] opacity-80 mb-3">Kuota terbatas! Segera daftarkan diri Anda.</div>
+                  <a href="#" class="bg-yellow-400 text-yellow-900 text-xs font-700 px-3 py-1.5 rounded-lg inline-block hover:bg-yellow-300 transition-colors">Daftar Sekarang →</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Jurnal (Dropdown) -->
+        <div class="relative" @mouseenter="jurnalOpen=true" @mouseleave="jurnalOpen=false">
+          <button class="flex items-center gap-1 px-4 py-2 rounded-lg hover:bg-brand-50 hover:text-brand-600 transition-colors" :class="jurnalOpen ? 'text-brand-600 bg-brand-50' : ''">
+            Jurnal <i class="fa-solid fa-chevron-down text-[10px] mt-0.5 transition-transform" :class="jurnalOpen ? 'rotate-180' : ''"></i>
+          </button>
+          <div class="dropdown-menu p-2 w-64" x-show="jurnalOpen" x-cloak x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0">
+            <a href="https://garuda.kemdiktisaintek.go.id/journal/view/21791" target="_blank" class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-brand-50 text-gray-700 hover:text-brand-700 transition-colors">
+              <i class="fa-solid fa-stethoscope w-4 text-brand-500 text-sm"></i> Sentani Nursing Journal
+            </a>
+            <a href="#" class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-brand-50 text-gray-700 hover:text-brand-700 transition-colors">
+              <i class="fa-solid fa-book w-4 text-brand-500 text-sm"></i> Seluruh Jurnal
+            </a>
+          </div>
+        </div>
+
+        <!-- Kontak -->
+        <a href="#kontak" class="px-4 py-2 rounded-lg hover:bg-brand-50 hover:text-brand-600 transition-colors">Kontak</a>
+
+        <!-- CTA Button -->
+        <a href="#" class="ml-3 bg-brand-600 text-white px-5 py-2 rounded-lg text-sm font-600 hover:bg-brand-700 transition-colors shadow-md flex items-center gap-2">
+          <i class="fa-solid fa-pen-to-square text-xs"></i> Daftar Sekarang
+        </a>
+      </div>
+
+      <!-- Mobile hamburger -->
+      <button class="lg:hidden text-gray-700 p-2 rounded-lg hover:bg-gray-100 transition-colors" @click="mobileMenu = !mobileMenu">
+        <i class="fa-solid" :class="mobileMenu ? 'fa-xmark text-xl' : 'fa-bars text-xl'"></i>
+      </button>
+    </div>
+
+    <!-- Mobile menu -->
+    <div class="lg:hidden border-t border-gray-100 py-4 space-y-1" x-show="mobileMenu" x-cloak x-transition>
+      <a href="#beranda" class="block px-4 py-2.5 rounded-lg hover:bg-brand-50 text-gray-700 hover:text-brand-700 font-medium">Beranda</a>
+      <a href="#" class="block px-4 py-2.5 rounded-lg hover:bg-brand-50 text-gray-700 hover:text-brand-700 font-medium">Tentang</a>
+      <a href="#prodi" class="block px-4 py-2.5 rounded-lg hover:bg-brand-50 text-gray-700 hover:text-brand-700 font-medium">Akademik</a>
+      <a href="#jurnal" class="block px-4 py-2.5 rounded-lg hover:bg-brand-50 text-gray-700 hover:text-brand-700 font-medium">Jurnal</a>
+      <a href="#kontak" class="block px-4 py-2.5 rounded-lg hover:bg-brand-50 text-gray-700 hover:text-brand-700 font-medium">Kontak</a>
+      <div class="pt-2 px-4">
+        <a href="#" class="block bg-brand-600 text-white px-5 py-2.5 rounded-lg font-600 text-center hover:bg-brand-700 transition-colors">Daftar Sekarang</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================================ HERO ============================================================ -->
+<section id="beranda" class="hero-bg text-white relative overflow-hidden">
+  <!-- Decorative circles -->
+  <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-white opacity-[0.03] rounded-full -translate-y-1/3 translate-x-1/4 pointer-events-none"></div>
+  <div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-white opacity-[0.03] rounded-full translate-y-1/2 -translate-x-1/4 pointer-events-none"></div>
+  <div class="absolute top-1/2 left-1/2 w-[800px] h-[800px] bg-white opacity-[0.02] rounded-full -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+
+  <div class="max-w-7xl mx-auto px-4 py-20 md:py-28 relative z-10">
+    <div class="grid lg:grid-cols-2 gap-12 items-center">
+      <!-- Text -->
+      <div>
+        <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-sm mb-6 backdrop-blur-sm">
+          <div class="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+          <span class="text-yellow-200 font-medium">Penerimaan Mahasiswa Baru 2025/2026 Dibuka!</span>
+        </div>
+        <h1 class="text-4xl md:text-5xl lg:text-[52px] font-extrabold leading-[1.15] mb-6">
+          Wujudkan Impianmu <br class="hidden md:block"/>
+          <span class="gradient-text">Bersama UNIJAYA</span>
+        </h1>
+        <p class="text-blue-100 text-lg leading-relaxed mb-8 max-w-lg">
+          Universitas Jayapura – kampus modern di Sentani, Papua. Hadir dengan program studi kesehatan dan bisnis berkualitas, mencetak generasi unggul untuk membangun Indonesia Timur.
+        </p>
+        <div class="flex flex-wrap gap-4">
+          <a href="#prodi" class="bg-yellow-400 text-yellow-900 font-bold px-7 py-3.5 rounded-xl hover:bg-yellow-300 transition-all shadow-lg hover:shadow-xl flex items-center gap-2">
+            <i class="fa-solid fa-graduation-cap"></i> Lihat Program Studi
+          </a>
+          <a href="#berita" class="bg-white/10 border border-white/30 text-white font-semibold px-7 py-3.5 rounded-xl hover:bg-white/20 transition-all backdrop-blur-sm flex items-center gap-2">
+            <i class="fa-solid fa-play-circle"></i> Profil Kampus
+          </a>
+        </div>
+
+        <!-- Stats row -->
+        <div class="flex flex-wrap gap-8 mt-12 pt-8 border-t border-white/20">
+          <div>
+            <div class="text-3xl font-extrabold text-white">5</div>
+            <div class="text-blue-200 text-sm mt-0.5">Program Studi</div>
+          </div>
+          <div>
+            <div class="text-3xl font-extrabold text-white">1.200+</div>
+            <div class="text-blue-200 text-sm mt-0.5">Mahasiswa Aktif</div>
+          </div>
+          <div>
+            <div class="text-3xl font-extrabold text-white">100+</div>
+            <div class="text-blue-200 text-sm mt-0.5">Dosen & Tenaga Ahli</div>
+          </div>
+          <div>
+            <div class="text-3xl font-extrabold text-white">1</div>
+            <div class="text-blue-200 text-sm mt-0.5">Tahun Universitas</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Visual: hero gallery slider -->
+      <div class="hidden lg:flex justify-center lg:justify-end" x-data="{
+        images: [
+          'images/mahasiswa-1.jpeg',
+          'images/mahasiswa-2.jpeg',
+          'images/mahasiswa-3.jpeg',
+          'images/mahasiswa-4.jpeg',
+          'images/mahasiswa-5.jpeg',
+          'images/mahasiswa-6.jpeg'
+        ],
+        center: 0,
+        timer: null,
+        init() {
+          if (this.images.length > 1) {
+            this.timer = setInterval(() => this.next(), 6500);
+          }
+        },
+        next() {
+          this.center = (this.center + 1) % this.images.length;
+        },
+        positionClass(index) {
+          const len = this.images.length;
+          if (!len) return 'hero-slide-hidden-right';
+          let delta = index - this.center;
+          if (delta > len / 2) delta -= len;
+          if (delta < -len / 2) delta += len;
+          if (delta === 0) return 'hero-slide-front';
+          if (delta === 1) return 'hero-slide-right';
+          if (delta === -1) return 'hero-slide-left';
+          return delta > 1 ? 'hero-slide-hidden-right' : 'hero-slide-hidden-left';
+        }
+      }">
+        <div class="hero-slider-stage" @mouseenter="if (timer) { clearInterval(timer); timer = null; }" @mouseleave="if (!timer && images.length > 1) { timer = setInterval(() => next(), 6500); }">
+          <template x-for="(image, index) in images" :key="image">
+            <div class="hero-slide" :class="positionClass(index)">
+              <img :src="image" alt="Galeri mahasiswa UNIJAYA" loading="lazy" />
+            </div>
+          </template>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Wave bottom -->
+  <div class="relative">
+    <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg" class="block w-full" preserveAspectRatio="none" style="height:60px">
+      <path d="M0 60L1440 60L1440 20C1200 60 900 0 720 20C540 40 240 0 0 20L0 60Z" fill="#f9fafb"/>
+    </svg>
+  </div>
+</section>
+
+<!-- ============================================================ PROGRAM STUDI ============================================================ -->
+<section id="prodi" class="py-20 bg-gray-50">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="text-center mb-14">
+      <div class="section-badge mb-4"><i class="fa-solid fa-graduation-cap mr-1"></i> Program Studi</div>
+      <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">Pilih Masa Depanmu</h2>
+      <p class="text-gray-500 text-lg max-w-2xl mx-auto">Lima program studi unggulan yang dirancang untuk menjawab kebutuhan dunia kerja di Tanah Papua dan Indonesia.</p>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+      <!-- Keperawatan -->
+      <div class="bg-white rounded-2xl shadow-md border border-gray-100 p-6 card-hover relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-red-50 rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+        <div class="prodi-icon bg-red-100 text-red-600 mb-4"><i class="fa-solid fa-heart-pulse"></i></div>
+        <div class="inline-block bg-red-100 text-red-700 text-xs font-700 px-2.5 py-1 rounded-full mb-3">Kesehatan</div>
+        <h3 class="text-lg font-bold text-gray-900 mb-2">Keperawatan & Profesi Ners</h3>
+        <p class="text-gray-500 text-sm leading-relaxed mb-5">Mencetak perawat profesional yang kompeten, berempati, dan siap mengabdi di wilayah Papua dan sekitarnya.</p>
+        <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+          <div class="flex items-center gap-1 text-xs text-gray-500"><i class="fa-solid fa-clock text-brand-500"></i> 4 Tahun (S1) + Profesi</div>
+          <a href="#" class="text-brand-600 font-600 text-sm hover:text-brand-800 transition-colors flex items-center gap-1">Selengkapnya <i class="fa-solid fa-arrow-right text-xs"></i></a>
+        </div>
+      </div>
+
+      <!-- Kebidanan -->
+      <div class="bg-white rounded-2xl shadow-md border border-gray-100 p-6 card-hover relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-pink-50 rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+        <div class="prodi-icon bg-pink-100 text-pink-600 mb-4"><i class="fa-solid fa-baby"></i></div>
+        <div class="inline-block bg-pink-100 text-pink-700 text-xs font-700 px-2.5 py-1 rounded-full mb-3">Kesehatan</div>
+        <h3 class="text-lg font-bold text-gray-900 mb-2">Kebidanan & Profesi Bidan</h3>
+        <p class="text-gray-500 text-sm leading-relaxed mb-5">Mempersiapkan bidan profesional yang mampu memberikan pelayanan kesehatan ibu dan anak secara holistik.</p>
+        <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+          <div class="flex items-center gap-1 text-xs text-gray-500"><i class="fa-solid fa-clock text-brand-500"></i> 4 Tahun (S1) + Profesi</div>
+          <a href="#" class="text-brand-600 font-600 text-sm hover:text-brand-800 transition-colors flex items-center gap-1">Selengkapnya <i class="fa-solid fa-arrow-right text-xs"></i></a>
+        </div>
+      </div>
+
+      <!-- Farmasi -->
+      <div class="bg-white rounded-2xl shadow-md border border-gray-100 p-6 card-hover relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-green-50 rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+        <div class="prodi-icon bg-green-100 text-green-600 mb-4"><i class="fa-solid fa-pills"></i></div>
+        <div class="inline-block bg-green-100 text-green-700 text-xs font-700 px-2.5 py-1 rounded-full mb-3">Kesehatan</div>
+        <h3 class="text-lg font-bold text-gray-900 mb-2">Farmasi</h3>
+        <p class="text-gray-500 text-sm leading-relaxed mb-5">Program studi yang menghasilkan tenaga farmasi handal yang menguasai ilmu kefarmasian dan teknologi obat modern.</p>
+        <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+          <div class="flex items-center gap-1 text-xs text-gray-500"><i class="fa-solid fa-clock text-brand-500"></i> 4 Tahun (S1)</div>
+          <a href="#" class="text-brand-600 font-600 text-sm hover:text-brand-800 transition-colors flex items-center gap-1">Selengkapnya <i class="fa-solid fa-arrow-right text-xs"></i></a>
+        </div>
+      </div>
+
+      <!-- Administrasi RS -->
+      <div class="bg-white rounded-2xl shadow-md border border-gray-100 p-6 card-hover relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+        <div class="prodi-icon bg-blue-100 text-blue-600 mb-4"><i class="fa-solid fa-hospital"></i></div>
+        <div class="inline-block bg-blue-100 text-blue-700 text-xs font-700 px-2.5 py-1 rounded-full mb-3">Manajemen</div>
+        <h3 class="text-lg font-bold text-gray-900 mb-2">Administrasi Rumah Sakit</h3>
+        <p class="text-gray-500 text-sm leading-relaxed mb-5">Mencetak manajer layanan kesehatan yang mampu mengelola rumah sakit secara efektif, efisien, dan profesional.</p>
+        <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+          <div class="flex items-center gap-1 text-xs text-gray-500"><i class="fa-solid fa-clock text-brand-500"></i> 4 Tahun (S1)</div>
+          <a href="#" class="text-brand-600 font-600 text-sm hover:text-brand-800 transition-colors flex items-center gap-1">Selengkapnya <i class="fa-solid fa-arrow-right text-xs"></i></a>
+        </div>
+      </div>
+
+      <!-- Bisnis Digital -->
+      <div class="bg-white rounded-2xl shadow-md border border-brand-200 p-6 card-hover relative overflow-hidden ring-2 ring-brand-500 ring-offset-2">
+        <div class="ribbon">Terbaru</div>
+        <div class="absolute top-0 right-0 w-32 h-32 bg-brand-50 rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+        <div class="prodi-icon bg-brand-100 text-brand-600 mb-4"><i class="fa-solid fa-laptop-code"></i></div>
+        <div class="inline-block bg-brand-100 text-brand-700 text-xs font-700 px-2.5 py-1 rounded-full mb-3">Teknologi & Bisnis</div>
+        <h3 class="text-lg font-bold text-gray-900 mb-2">Bisnis Digital</h3>
+        <p class="text-gray-500 text-sm leading-relaxed mb-5">Program studi inovatif yang memadukan teknologi digital dengan manajemen bisnis untuk menjawab tantangan era Industry 4.0.</p>
+        <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+          <div class="flex items-center gap-1 text-xs text-gray-500"><i class="fa-solid fa-clock text-brand-500"></i> 4 Tahun (S1)</div>
+          <a href="#" class="text-brand-600 font-600 text-sm hover:text-brand-800 transition-colors flex items-center gap-1">Selengkapnya <i class="fa-solid fa-arrow-right text-xs"></i></a>
+        </div>
+      </div>
+
+      <!-- CTA card -->
+      <div class="bg-gradient-to-br from-brand-700 to-brand-500 rounded-2xl p-6 flex flex-col justify-between text-white card-hover">
+        <div>
+          <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-4"><i class="fa-solid fa-lightbulb text-2xl text-yellow-300"></i></div>
+          <h3 class="text-lg font-bold mb-2">Masih Bingung Memilih?</h3>
+          <p class="text-blue-100 text-sm leading-relaxed">Tim konselor kami siap membantu Anda menemukan program studi yang paling sesuai dengan minat dan bakat Anda.</p>
+        </div>
+        <a href="#kontak" class="mt-6 bg-white text-brand-700 font-bold px-5 py-2.5 rounded-xl text-sm hover:bg-yellow-50 transition-colors inline-block text-center">
+          Konsultasi Gratis <i class="fa-solid fa-arrow-right ml-1"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ BERITA & PENGUMUMAN ============================================================ -->
+<section id="berita" class="py-20 bg-white">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="text-center mb-14">
+      <div class="section-badge mb-4"><i class="fa-solid fa-newspaper mr-1"></i> Informasi Terkini</div>
+      <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">Berita & Pengumuman</h2>
+      <p class="text-gray-500 text-lg max-w-xl mx-auto">Tetap terhubung dengan informasi terkini dari kampus Universitas Jayapura.</p>
+    </div>
+
+    <div class="grid lg:grid-cols-3 gap-8">
+      <!-- Berita (2/3) -->
+      <div class="lg:col-span-2">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-xl font-bold text-gray-900 flex items-center gap-2"><span class="w-1 h-6 bg-brand-600 rounded-full inline-block"></span> Berita Terbaru</h3>
+          <a href="#" class="text-brand-600 text-sm font-600 hover:text-brand-800 flex items-center gap-1">Lihat Semua <i class="fa-solid fa-arrow-right text-xs"></i></a>
+        </div>
+        <div class="space-y-5">
+
+          <!-- Berita 1 -->
+          <div class="flex gap-4 bg-gray-50 rounded-2xl p-4 hover:shadow-md transition-all berita-card card-hover">
+            <div class="w-28 h-24 rounded-xl overflow-hidden flex-shrink-0">
+              <img src="./images/mahasiswa-1.jpeg" alt="Cover berita" class="w-full h-full object-cover" />
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="bg-brand-100 text-brand-700 text-xs font-600 px-2 py-0.5 rounded-full">Berita</span>
+                <span class="text-gray-400 text-xs"><i class="fa-regular fa-calendar mr-1"></i>07 Maret 2026</span>
+              </div>
+              <h4 class="font-bold text-gray-900 text-sm leading-snug mb-2 line-clamp-2">Berbagi di Bulan Suci Ramadhan: Dosen dan Mahasiswa UNIJAYA Turun ke Jalan Berbagi Takjil</h4>
+              <p class="text-gray-500 text-xs leading-relaxed line-clamp-2">Dalam semangat kebersamaan di bulan suci Ramadan, mahasiswa dan dosen Universitas Jayapura menggelar kegiatan berbagi takjil kepada masyarakat di kawasan Lampu Merah Bandara Sentani.</p>
+            </div>
+          </div>
+
+          <!-- Berita 2 -->
+          <div class="flex gap-4 bg-gray-50 rounded-2xl p-4 hover:shadow-md transition-all berita-card card-hover">
+            <div class="w-28 h-24 rounded-xl overflow-hidden flex-shrink-0">
+              <img src="./images/mahasiswa-2.jpeg" alt="Cover berita" class="w-full h-full object-cover" />
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="bg-brand-100 text-brand-700 text-xs font-600 px-2 py-0.5 rounded-full">Berita</span>
+                <span class="text-gray-400 text-xs"><i class="fa-regular fa-calendar mr-1"></i>06 Februari 2026</span>
+              </div>
+              <h4 class="font-bold text-gray-900 text-sm leading-snug mb-2 line-clamp-2">Dies Natalis Pertama Universitas Jayapura: Babak Baru Transformasi STIKES Menjadi Universitas</h4>
+              <p class="text-gray-500 text-xs leading-relaxed line-clamp-2">Universitas Jayapura memperingati Dies Natalis pertama sebagai momentum bersejarah atas transformasi kelembagaan dari STIKES menjadi Universitas.</p>
+            </div>
+          </div>
+
+          <!-- Berita 3 -->
+          <div class="flex gap-4 bg-gray-50 rounded-2xl p-4 hover:shadow-md transition-all berita-card card-hover">
+            <div class="w-28 h-24 rounded-xl overflow-hidden flex-shrink-0">
+              <img src="./images/mahasiswa-4.jpeg" alt="Cover berita" class="w-full h-full object-cover" />
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="bg-brand-100 text-brand-700 text-xs font-600 px-2 py-0.5 rounded-full">Berita</span>
+                <span class="text-gray-400 text-xs"><i class="fa-regular fa-calendar mr-1"></i>12 November 2025</span>
+              </div>
+              <h4 class="font-bold text-gray-900 text-sm leading-snug mb-2 line-clamp-2">Upacara Peringatan Hari Pahlawan ke-80 Tahun di Universitas Jayapura</h4>
+              <p class="text-gray-500 text-xs leading-relaxed line-clamp-2">Kepala LLDIKTI Wilayah 14, Dr. Suriel Semuel Mofu, hadir sebagai pembina upacara Hari Pahlawan Nasional 10 November 2025 di Universitas Jayapura.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Pengumuman (1/3) -->
+      <div>
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-xl font-bold text-gray-900 flex items-center gap-2"><span class="w-1 h-6 bg-yellow-400 rounded-full inline-block"></span> Pengumuman</h3>
+          <a href="#" class="text-brand-600 text-sm font-600 hover:text-brand-800 flex items-center gap-1">Semua <i class="fa-solid fa-arrow-right text-xs"></i></a>
+        </div>
+        <div class="space-y-3">
+
+          <!-- Pengumuman 1 -->
+          <div class="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 card-hover">
+            <div class="flex items-center gap-2 mb-2">
+              <div class="w-7 h-7 bg-yellow-400 rounded-lg flex items-center justify-center"><i class="fa-solid fa-triangle-exclamation text-yellow-900 text-xs"></i></div>
+              <span class="text-yellow-800 text-xs font-700">10 Maret 2026</span>
+            </div>
+            <h4 class="font-bold text-gray-900 text-sm leading-snug mb-1">5 Hal yang Dilarang di Lingkungan UNIJAYA</h4>
+            <p class="text-gray-600 text-xs leading-relaxed line-clamp-3">Dalam rangka menciptakan lingkungan kampus yang aman, nyaman, dan saling menghargai...</p>
+            <a href="#" class="text-brand-600 text-xs font-600 mt-2 inline-block hover:text-brand-800">Baca Selengkapnya →</a>
+          </div>
+
+          <!-- Pengumuman 2 -->
+          <div class="bg-brand-50 border border-brand-200 rounded-2xl p-4 card-hover">
+            <div class="flex items-center gap-2 mb-2">
+              <div class="w-7 h-7 bg-brand-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-bullhorn text-white text-xs"></i></div>
+              <span class="text-brand-800 text-xs font-700">16 September 2025</span>
+            </div>
+            <h4 class="font-bold text-gray-900 text-sm leading-snug mb-1">Pendaftaran Calon Ketua & Wakil Ketua BEM UNIJAYA 2026</h4>
+            <p class="text-gray-600 text-xs leading-relaxed line-clamp-3">Bagi mahasiswa yang memiliki jiwa kepemimpinan dan ingin berkontribusi untuk kemajuan kampus...</p>
+            <a href="#" class="text-brand-600 text-xs font-600 mt-2 inline-block hover:text-brand-800">Baca Selengkapnya →</a>
+          </div>
+
+          <!-- PMB Banner -->
+          <div class="bg-brand-700 rounded-2xl p-5 text-white">
+            <div class="flex items-center gap-2 mb-3">
+              <div class="w-8 h-8 bg-yellow-400 rounded-xl flex items-center justify-center"><i class="fa-solid fa-star text-yellow-900"></i></div>
+              <span class="font-bold text-sm">PMB 2025/2026</span>
+            </div>
+            <p class="text-blue-100 text-xs leading-relaxed mb-4">Penerimaan Mahasiswa Baru sedang dibuka. Bergabunglah bersama ribuan mahasiswa UNIJAYA!</p>
+            <a href="#" class="block bg-yellow-400 text-yellow-900 font-bold px-4 py-2.5 rounded-xl text-sm text-center hover:bg-yellow-300 transition-colors">
+              <i class="fa-solid fa-pen-to-square mr-1"></i> Daftar Sekarang
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ GALERI KEGIATAN ============================================================ -->
+<section id="galeri" class="py-20 bg-gray-50">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="text-center mb-14">
+      <div class="section-badge mb-4"><i class="fa-solid fa-images mr-1"></i> Galeri</div>
+      <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">Kegiatan Mahasiswa</h2>
+      <p class="text-gray-500 text-lg max-w-xl mx-auto">Potret semangat dan kreativitas mahasiswa Universitas Jayapura dalam berbagai kegiatan kampus.</p>
+    </div>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden card-hover">
+        <div class="gallery-item relative">
+          <img src="./images/mahasiswa-3.jpeg" alt="Album Dies Natalis" class="w-full aspect-square object-cover" />
+          <span class="absolute top-3 right-3 bg-black/70 text-white text-xs font-semibold px-2.5 py-1 rounded-full">24 foto</span>
+        </div>
+        <div class="p-4">
+          <h3 class="font-bold text-gray-900 text-sm leading-snug">Dies Natalis I UNIJAYA</h3>
+        </div>
+      </div>
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden card-hover">
+        <div class="gallery-item relative">
+          <img src="./images/mahasiswa-4.jpeg" alt="Album Praktikum" class="w-full aspect-square object-cover" />
+          <span class="absolute top-3 right-3 bg-black/70 text-white text-xs font-semibold px-2.5 py-1 rounded-full">18 foto</span>
+        </div>
+        <div class="p-4">
+          <h3 class="font-bold text-gray-900 text-sm leading-snug">Praktikum Laboratorium</h3>
+        </div>
+      </div>
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden card-hover">
+        <div class="gallery-item relative">
+          <img src="./images/mahasiswa-5.jpeg" alt="Album Seminar" class="w-full aspect-square object-cover" />
+          <span class="absolute top-3 right-3 bg-black/70 text-white text-xs font-semibold px-2.5 py-1 rounded-full">32 foto</span>
+        </div>
+        <div class="p-4">
+          <h3 class="font-bold text-gray-900 text-sm leading-snug">Seminar Nasional</h3>
+        </div>
+      </div>
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden card-hover">
+        <div class="gallery-item relative">
+          <img src="./images/mahasiswa-6.jpeg" alt="Album Bakti Sosial" class="w-full aspect-square object-cover" />
+          <span class="absolute top-3 right-3 bg-black/70 text-white text-xs font-semibold px-2.5 py-1 rounded-full">15 foto</span>
+        </div>
+        <div class="p-4">
+          <h3 class="font-bold text-gray-900 text-sm leading-snug">Bakti Sosial Ramadan</h3>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center mt-8">
+      <a href="#" class="inline-flex items-center gap-2 border-2 border-brand-600 text-brand-600 font-bold px-7 py-3 rounded-xl hover:bg-brand-600 hover:text-white transition-all">
+        <i class="fa-solid fa-images"></i> Lihat Semua Galeri
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ FASILITAS ============================================================ -->
+<section id="fasilitas" class="py-20 bg-white">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="grid lg:grid-cols-2 gap-16 items-center">
+      <!-- Text -->
+      <div>
+        <div class="section-badge mb-4"><i class="fa-solid fa-building-columns mr-1"></i> Fasilitas</div>
+        <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-5">Fasilitas Penunjang <span class="text-brand-600">Pendidikan Modern</span></h2>
+        <p class="text-gray-500 text-lg leading-relaxed mb-8">Universitas Jayapura dilengkapi dengan fasilitas lengkap dan modern untuk mendukung proses belajar mengajar yang optimal dan pengembangan potensi mahasiswa.</p>
+
+        <div class="space-y-4">
+          <div class="flex items-start gap-4 p-4 bg-gray-50 rounded-2xl hover:shadow-md transition-all card-hover">
+            <div class="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-600 flex-shrink-0">
+              <i class="fa-solid fa-book-open text-xl"></i>
+            </div>
+            <div>
+              <h4 class="font-bold text-gray-900 mb-1">Perpustakaan Digital</h4>
+              <p class="text-gray-500 text-sm leading-relaxed">Koleksi ribuan buku, jurnal, dan e-book yang bisa diakses kapan saja dan di mana saja oleh seluruh civitas akademika.</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-4 p-4 bg-gray-50 rounded-2xl hover:shadow-md transition-all card-hover">
+            <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center text-green-600 flex-shrink-0">
+              <i class="fa-solid fa-flask text-xl"></i>
+            </div>
+            <div>
+              <h4 class="font-bold text-gray-900 mb-1">Laboratorium Modern</h4>
+              <p class="text-gray-500 text-sm leading-relaxed">Lab terpadu meliputi lab keperawatan, kebidanan, farmasi, dan komputer dengan peralatan standar rumah sakit modern.</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-4 p-4 bg-gray-50 rounded-2xl hover:shadow-md transition-all card-hover">
+            <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center text-red-600 flex-shrink-0">
+              <i class="fa-solid fa-house-medical text-xl"></i>
+            </div>
+            <div>
+              <h4 class="font-bold text-gray-900 mb-1">Klinik & Apotek Kampus</h4>
+              <p class="text-gray-500 text-sm leading-relaxed">Fasilitas klinik kesehatan dan apotek dalam kampus untuk mendukung kesehatan mahasiswa sekaligus sebagai wahana praktik langsung.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats grid -->
+      <div class="grid grid-cols-2 gap-5">
+        <div class="stat-card shadow-md card-hover">
+          <div class="w-14 h-14 bg-brand-100 rounded-2xl flex items-center justify-center text-brand-600 mx-auto mb-4"><i class="fa-solid fa-book text-2xl"></i></div>
+          <div class="text-3xl font-extrabold text-brand-700 mb-1">5.000+</div>
+          <div class="text-gray-500 text-sm">Koleksi Buku</div>
+        </div>
+        <div class="stat-card shadow-md card-hover">
+          <div class="w-14 h-14 bg-green-100 rounded-2xl flex items-center justify-center text-green-600 mx-auto mb-4"><i class="fa-solid fa-flask text-2xl"></i></div>
+          <div class="text-3xl font-extrabold text-green-700 mb-1">8</div>
+          <div class="text-gray-500 text-sm">Laboratorium</div>
+        </div>
+        <div class="stat-card shadow-md card-hover">
+          <div class="w-14 h-14 bg-yellow-100 rounded-2xl flex items-center justify-center text-yellow-600 mx-auto mb-4"><i class="fa-solid fa-wifi text-2xl"></i></div>
+          <div class="text-3xl font-extrabold text-yellow-700 mb-1">100%</div>
+          <div class="text-gray-500 text-sm">Akses WiFi Kampus</div>
+        </div>
+        <div class="stat-card shadow-md card-hover">
+          <div class="w-14 h-14 bg-red-100 rounded-2xl flex items-center justify-center text-red-600 mx-auto mb-4"><i class="fa-solid fa-stethoscope text-2xl"></i></div>
+          <div class="text-3xl font-extrabold text-red-700 mb-1">1</div>
+          <div class="text-gray-500 text-sm">Klinik & Apotek</div>
+        </div>
+        <div class="col-span-2 bg-gradient-to-r from-brand-700 to-brand-500 rounded-2xl p-6 text-white text-center card-hover">
+          <div class="text-4xl font-extrabold mb-1">2 Ha</div>
+          <div class="text-blue-200 text-sm">Luas Area Kampus</div>
+          <div class="text-blue-100 text-xs mt-2">Sentani, Kabupaten Jayapura, Papua</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ CTA ============================================================ -->
+<section id="daftar" class="py-20 cta-bg relative overflow-hidden">
+  <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-white opacity-[0.03] rounded-full -translate-y-1/3 translate-x-1/4 pointer-events-none"></div>
+  <div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-white opacity-[0.03] rounded-full translate-y-1/2 -translate-x-1/4 pointer-events-none"></div>
+  <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
+    <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-sm mb-6 backdrop-blur-sm">
+      <div class="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+      <span class="text-yellow-200 font-medium">Pendaftaran Mahasiswa Baru 2025/2026</span>
+    </div>
+    <h2 class="text-4xl md:text-5xl font-extrabold text-white mb-6 leading-tight">
+      Siap Bergabung dengan<br/><span class="gradient-text">Universitas Jayapura?</span>
+    </h2>
+    <p class="text-blue-100 text-lg leading-relaxed mb-10 max-w-2xl mx-auto">
+      Raih impianmu bersama ribuan mahasiswa UNIJAYA. Pilih program studi yang sesuai, daftar sekarang, dan mulailah perjalanan akademikmu di jantung Tanah Papua.
+    </p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+      <a href="#" class="bg-yellow-400 text-yellow-900 font-bold px-8 py-4 rounded-xl hover:bg-yellow-300 transition-all shadow-xl text-lg flex items-center justify-center gap-2">
+        <i class="fa-solid fa-pen-to-square"></i> Daftar Sekarang – Gratis
+      </a>
+      <a href="#" class="bg-white/10 border border-white/30 text-white font-semibold px-8 py-4 rounded-xl hover:bg-white/20 transition-all backdrop-blur-sm text-lg flex items-center justify-center gap-2">
+        <i class="fa-solid fa-info-circle"></i> Info Pendaftaran
+      </a>
+    </div>
+    <p class="text-blue-200 text-sm mt-6 flex items-center justify-center gap-2">
+      <i class="fa-solid fa-shield-halved"></i> Pendaftaran aman, terpercaya, dan tanpa biaya tersembunyi.
+    </p>
+  </div>
+</section>
+
+<!-- ============================================================ FOOTER ============================================================ -->
+<footer id="kontak" class="bg-brand-900 text-white pt-16 pb-8">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+
+      <!-- Brand -->
+      <div class="lg:col-span-1">
+        <div class="flex items-center gap-3 mb-5">
+          <img src="https://www.unijaya.ac.id/assets/img/logo.png" alt="Logo Universitas Jayapura" class="w-10 h-10 rounded-xl object-contain bg-white p-1" />
+          <div>
+            <div class="font-extrabold text-white text-[15px] leading-tight">Universitas Jayapura</div>
+            <div class="text-blue-300 text-[10px] font-medium tracking-wide uppercase">UNIJAYA</div>
+          </div>
+        </div>
+        <p class="text-blue-200 text-sm leading-relaxed mb-6">Kampus modern di Sentani, Papua yang mencetak generasi unggul, inovatif, dan berkarakter untuk membangun Indonesia Timur.</p>
+        <div class="flex items-center gap-3">
+          <a href="#" class="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center hover:bg-brand-600 transition-colors"><i class="fa-brands fa-facebook-f text-sm"></i></a>
+          <a href="#" class="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center hover:bg-pink-600 transition-colors"><i class="fa-brands fa-instagram text-sm"></i></a>
+          <a href="#" class="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center hover:bg-sky-600 transition-colors"><i class="fa-brands fa-x-twitter text-sm"></i></a>
+          <a href="#" class="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center hover:bg-red-600 transition-colors"><i class="fa-brands fa-youtube text-sm"></i></a>
+        </div>
+      </div>
+
+      <!-- Tentang -->
+      <div>
+        <h4 class="font-bold text-white mb-4 text-sm uppercase tracking-wider">Tentang</h4>
+        <ul class="space-y-2.5">
+          <li><a href="#" class="text-blue-300 hover:text-white text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[10px] text-brand-400"></i> Sejarah UNIJAYA</a></li>
+          <li><a href="#" class="text-blue-300 hover:text-white text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[10px] text-brand-400"></i> Visi & Misi</a></li>
+          <li><a href="#" class="text-blue-300 hover:text-white text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[10px] text-brand-400"></i> Struktur Organisasi</a></li>
+          <li><a href="#" class="text-blue-300 hover:text-white text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[10px] text-brand-400"></i> Akreditasi</a></li>
+          <li><a href="#" class="text-blue-300 hover:text-white text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[10px] text-brand-400"></i> Dosen & Staff</a></li>
+        </ul>
+      </div>
+
+      <!-- Akademik -->
+      <div>
+        <h4 class="font-bold text-white mb-4 text-sm uppercase tracking-wider">Akademik</h4>
+        <ul class="space-y-2.5">
+          <li><a href="#" class="text-blue-300 hover:text-white text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[10px] text-brand-400"></i> Keperawatan</a></li>
+          <li><a href="#" class="text-blue-300 hover:text-white text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[10px] text-brand-400"></i> Kebidanan</a></li>
+          <li><a href="#" class="text-blue-300 hover:text-white text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[10px] text-brand-400"></i> Farmasi</a></li>
+          <li><a href="#" class="text-blue-300 hover:text-white text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[10px] text-brand-400"></i> Administrasi RS</a></li>
+          <li><a href="#" class="text-blue-300 hover:text-white text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[10px] text-brand-400"></i> Bisnis Digital</a></li>
+          <li><a href="https://garuda.kemdiktisaintek.go.id/journal/view/21791" target="_blank" class="text-blue-300 hover:text-white text-sm transition-colors flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[10px] text-brand-400"></i> Sentani Nursing Journal</a></li>
+        </ul>
+      </div>
+
+      <!-- Kontak -->
+      <div>
+        <h4 class="font-bold text-white mb-4 text-sm uppercase tracking-wider">Kontak Kami</h4>
+        <ul class="space-y-4">
+          <li class="flex items-start gap-3">
+            <div class="w-7 h-7 bg-brand-700 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"><i class="fa-solid fa-map-marker-alt text-brand-300 text-xs"></i></div>
+            <div class="text-blue-200 text-sm leading-relaxed">Jl. Sentani, Kabupaten Jayapura,<br/>Papua, Indonesia</div>
+          </li>
+          <li class="flex items-center gap-3">
+            <div class="w-7 h-7 bg-brand-700 rounded-lg flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-phone text-brand-300 text-xs"></i></div>
+            <a href="tel:+62" class="text-blue-200 text-sm hover:text-white transition-colors">(0967) xxx-xxxx</a>
+          </li>
+          <li class="flex items-center gap-3">
+            <div class="w-7 h-7 bg-brand-700 rounded-lg flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-envelope text-brand-300 text-xs"></i></div>
+            <a href="mailto:info@unijaya.ac.id" class="text-blue-200 text-sm hover:text-white transition-colors">info@unijaya.ac.id</a>
+          </li>
+          <li class="flex items-center gap-3">
+            <div class="w-7 h-7 bg-brand-700 rounded-lg flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-globe text-brand-300 text-xs"></i></div>
+            <a href="https://www.unijaya.ac.id" target="_blank" class="text-blue-200 text-sm hover:text-white transition-colors">www.unijaya.ac.id</a>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- Bottom bar -->
+    <div class="border-t border-white/10 pt-6 flex flex-col md:flex-row items-center justify-between gap-3">
+      <div class="text-blue-300 text-xs">© 2026 Universitas Jayapura. Hak Cipta Dilindungi.</div>
+      <div class="flex items-center gap-4 text-xs text-blue-400">
+        <a href="#" class="hover:text-white transition-colors">Kebijakan Privasi</a>
+        <span>·</span>
+        <a href="#" class="hover:text-white transition-colors">Syarat & Ketentuan</a>
+        <span>·</span>
+        <a href="#" class="hover:text-white transition-colors">Peta Situs</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Back to top -->
+<button onclick="window.scrollTo({top:0,behavior:'smooth'})"
+  class="fixed bottom-6 right-6 w-12 h-12 bg-brand-600 text-white rounded-xl shadow-lg hover:bg-brand-700 transition-all flex items-center justify-center z-50 hover:scale-110">
+  <i class="fa-solid fa-chevron-up"></i>
+</button>
+
+</body>
+</html>
